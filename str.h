@@ -21,6 +21,8 @@ AUTHOR: korvo
 #define STR_EXPORT extern
 #endif
 
+// #define STR_IMPLEMENTATION
+
 typedef struct {
     char* ptr;
 
@@ -35,7 +37,7 @@ typedef struct {
 #define STR_MAKE_NULL \
     (str_t) { .ptr = NULL, .capacity = 0, .len = 0 }
 
-STR_EXPORT str_t str_create();
+STR_EXPORT str_t str_create(void);
 STR_EXPORT str_t str_generate(const char* format, ...);
 STR_EXPORT str_t str_clone(const str_t* from);
 STR_EXPORT str_t str_from_cstr_move(char**);
@@ -52,6 +54,12 @@ STR_EXPORT void str_append(str_t*, const str_t* from);
 STR_EXPORT void str_insert_char(str_t*, const char, const uint32_t idx);
 STR_EXPORT void str_insert(str_t*, const str_t* from, const uint32_t idx);
 STR_EXPORT char str_pop(str_t*);
+
+STR_EXPORT bool str_starts_with(const str_t*, const str_t* startswith);
+STR_EXPORT bool str_starts_with_cstr(const str_t*, const char* startswith);
+
+STR_EXPORT bool str_ends_with(const str_t*, const str_t* endswith);
+STR_EXPORT bool str_ends_with_cstr(const str_t*, const char* endswith);
 
 #ifndef DEFAULT_STR_CAPACITY
 #define DEFAULT_STR_CAPACITY 32
@@ -89,7 +97,7 @@ static inline void str_fit(str_t* str, uint32_t fit_cap) {
     str->ptr = realloc(str->ptr, cap);
 }
 
-STR_EXPORT str_t str_create() {
+STR_EXPORT str_t str_create(void) {
     const str_t out = {
         .ptr = malloc(DEFAULT_STR_CAPACITY),
         .capacity = DEFAULT_STR_CAPACITY,
@@ -130,7 +138,7 @@ STR_EXPORT str_t str_clone(const str_t* in) {
     };
 }
 
-STR_EXPORT const char* str_cstr(const str_t* in) {
+STR_EXPORT inline const char* str_cstr(const str_t* in) {
     if (in->ptr[in->len] != 0)
         in->ptr[in->len] = 0;
 
@@ -259,6 +267,62 @@ STR_EXPORT void str_insert(str_t* str, const str_t* from, const uint32_t idx) {
         str->ptr[i] = from->ptr[i];
 
     str->len = final_len;
+}
+
+STR_EXPORT bool str_starts_with(const str_t* str, const str_t* startswith) {
+    if (str->len < startswith->len)
+        return false;
+
+    for (uint32_t i = 0; i < startswith->len; i++) {
+        if (str->ptr[i] != startswith->ptr[i])
+            return false;
+    }
+
+    return true;
+}
+
+STR_EXPORT bool str_starts_with_cstr(const str_t* str, const char* startswith) {
+    const uint32_t startswith_len = str_cstrlen(startswith);
+
+    if (str->len < startswith_len)
+        return false;
+
+    for (uint32_t i = 0; i < startswith_len; i++) {
+        if (str->ptr[i] != startswith[i])
+            return false;
+    }
+
+    return true;
+}
+
+STR_EXPORT bool str_ends_with(const str_t* str, const str_t* endswith) {
+    if (str->len < endswith->len)
+        return false;
+
+    const uint32_t offset = str->len - endswith->len;
+
+    for (uint32_t i = 0; i < endswith->len; i++) {
+        if (str->ptr[offset + i] != endswith->ptr[i])
+            return false;
+    }
+
+    return true;
+}
+
+STR_EXPORT bool str_ends_with_cstr(const str_t* str, const char* endswith) {
+    const uint32_t endswith_len = str_cstrlen(endswith);
+
+    if (str->len < endswith_len)
+        return false;
+
+    const uint32_t offset = str->len - endswith_len;
+
+    for (uint32_t i = 0; i < endswith_len; i++) {
+        if (str->ptr[offset + i] != endswith[i])
+            return false;
+    }
+
+    return true;
 }
 
 #endif

@@ -273,6 +273,11 @@ STR_EXPORT void str_insert(str_t* str, const str_t* from, const uint32_t idx) {
     str->len = final_len;
 }
 
+STR_EXPORT char str_pop(str_t* str) {
+    str->len -= 1;
+    return str->ptr[str->len];
+}
+
 STR_EXPORT bool str_starts_with(const str_t* str, const str_t* startswith) {
     if (str->len < startswith->len)
         return false;

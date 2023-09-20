@@ -30,12 +30,16 @@ typedef struct {
     uint32_t len;
 } str_t;
 
-#define STR_STATIC_DEFN(str) \
-    (str_t) { .ptr = str, .capacity = sizeof(str) - 1, .len = sizeof(str) - 1 }
+#define STR_STATIC_DEFN(str)                                            \
+    (str_t) {                                                           \
+        .ptr = str, .capacity = sizeof(str) - 1, .len = sizeof(str) - 1 \
+    }
 
 #define STR_IS_NULL(str) (str.ptr == NULL)
-#define STR_MAKE_NULL \
-    (str_t) { .ptr = NULL, .capacity = 0, .len = 0 }
+#define STR_MAKE_NULL                        \
+    (str_t) {                                \
+        .ptr = NULL, .capacity = 0, .len = 0 \
+    }
 
 STR_EXPORT str_t str_create(void);
 STR_EXPORT str_t str_generate(const char* format, ...);
@@ -138,7 +142,7 @@ STR_EXPORT str_t str_clone(const str_t* in) {
     };
 }
 
-STR_EXPORT inline const char* str_cstr(const str_t* in) {
+STR_EXPORT const char* str_cstr(const str_t* in) {
     if (in->ptr[in->len] != 0)
         in->ptr[in->len] = 0;
 
